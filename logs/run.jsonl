@@ -50,3 +50,4 @@
 {"type": "incoming_message", "chat_id": 1172630671, "text": "Calculate 10+5", "ts": 1785433017.4481666}
 {"type": "incoming_message", "chat_id": 1172630671, "text": "Hello", "ts": 1785433374.3905497}
 {"type": "incoming_message", "chat_id": 1172630671, "text": "Calculate 10+5", "ts": 1785433398.8470955}
+{"type": "model_output", "step": 1, "content": "THOUGHT: Simple arithmetic operation.\n\nACTION:\npython\nprint(10 + 5)", "ts": 1785433429.148865, "chat_id": 1172630671}
