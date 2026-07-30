@@ -37,3 +37,4 @@
 {"type": "model_output", "step": 5, "content": "THOUGHT: The result of 5 + 10 is indeed 15.\nFINAL:\n{\"result\": 15}", "ts": 1785431297.6871426, "chat_id": 8577605645}
 {"type": "final_answer", "step": 5, "answer": {"result": 15}, "chat_id": 8577605645, "ts": 1785431298.9080822}
 {"type": "reply_sent", "chat_id": 8577605645, "reply": {"result": 15, "log_url": "https://raw.githubusercontent.com/vidhichavan11-source/tds-p1-bot/main/logs/run.jsonl"}, "ts": 1785431300.137472}
+{"type": "incoming_message", "chat_id": 8577605645, "text": "hello", "ts": 1785432079.9013717}
