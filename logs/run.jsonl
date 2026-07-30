@@ -46,3 +46,4 @@
 {"type": "model_output", "step": 1, "content": "THOUGHT: The user has not provided any observation yet. This is the beginning of our conversation.\n\nFINAL: {\"key\": \"value\"}", "ts": 1785432910.7539184, "chat_id": 1172630671}
 {"type": "final_answer", "step": 1, "answer": {"key": "value"}, "chat_id": 1172630671, "ts": 1785432911.800715}
 {"type": "reply_sent", "chat_id": 1172630671, "reply": {"key": "value", "log_url": "https://raw.githubusercontent.com/vidhichavan11-source/tds-p1-bot/main/logs/run.jsonl"}, "ts": 1785432913.003527}
+{"type": "incoming_message", "chat_id": 1172630671, "text": "hello", "ts": 1785433001.376877}
