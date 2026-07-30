@@ -147,6 +147,7 @@ def _process_update(chat_id: int, message_text: str):
     print("Chat:", chat_id, flush=True)
     print("Message:", message_text, flush=True)
 
+
     _safe_log(
         {
             "type": "incoming_message",
@@ -155,24 +156,32 @@ def _process_update(chat_id: int, message_text: str):
         }
     )
 
+
+    # Quick replies for greetings
+    if message_text.lower().strip() in [
+        "hello",
+        "hi",
+        "hey",
+        "hii"
+    ]:
+        _send_telegram_message(
+            chat_id,
+            "Hello! 👋 I am your data analyst bot. Ask me a data question."
+        )
+        print("Greeting handled", flush=True)
+        return
+
+
     question = _build_context(
         chat_id,
         message_text
     )
-    if message_text.lower().strip() in [
-    "hello",
-    "hi",
-    "hey",
-    "hii"
-]:
-    _send_telegram_message(
-        chat_id,
-        "Hello! 👋 I am your data analyst bot. Ask me a data question."
-    )
-    return
+
 
     try:
+
         print("🔥 Calling run_agent...", flush=True)
+
 
         answer = run_agent(
             question,
@@ -185,12 +194,15 @@ def _process_update(chat_id: int, message_text: str):
                 )
         )
 
+
         print("🔥 run_agent finished", flush=True)
+
 
     except Exception as e:
 
         import traceback
         traceback.print_exc()
+
 
         _send_telegram_message(
             chat_id,
@@ -200,7 +212,7 @@ def _process_update(chat_id: int, message_text: str):
         return
 
 
-    # Prepare reply
+
     if isinstance(answer, dict):
 
         answer["log_url"] = log_url()
@@ -211,6 +223,7 @@ def _process_update(chat_id: int, message_text: str):
             "answer": answer,
             "log_url": log_url()
         }
+
 
 
     reply = json.dumps(
@@ -230,6 +243,7 @@ def _process_update(chat_id: int, message_text: str):
 
     print("Sending Telegram reply...", flush=True)
 
+
     _send_telegram_message(
         chat_id,
         reply
@@ -237,7 +251,6 @@ def _process_update(chat_id: int, message_text: str):
 
 
     print("🔥🔥🔥 PROCESS END 🔥🔥🔥", flush=True)
-
 @app.post("/webhook/{secret}")
 async def telegram_webhook(
         secret: str,
