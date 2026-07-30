@@ -159,6 +159,17 @@ def _process_update(chat_id: int, message_text: str):
         chat_id,
         message_text
     )
+    if message_text.lower().strip() in [
+    "hello",
+    "hi",
+    "hey",
+    "hii"
+]:
+    _send_telegram_message(
+        chat_id,
+        "Hello! 👋 I am your data analyst bot. Ask me a data question."
+    )
+    return
 
     try:
         print("🔥 Calling run_agent...", flush=True)
