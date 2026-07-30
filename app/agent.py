@@ -32,7 +32,7 @@ import requests
 from .executor import run_python
 
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
-OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "gemma3:4b")
+OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "llama3.2:1b")
 MAX_STEPS = 8
 
 SYSTEM_PROMPT = """You are a careful data-analyst agent. You answer a single \
@@ -74,6 +74,10 @@ FINAL_RE = re.compile(
 
 
 def _call_ollama(messages: list[dict]) -> str:
+
+    print("OLLAMA URL:", OLLAMA_URL, flush=True)
+    print("OLLAMA MODEL:", OLLAMA_MODEL, flush=True)
+
     resp = requests.post(
         f"{OLLAMA_URL}/api/chat",
         json={
@@ -85,10 +89,11 @@ def _call_ollama(messages: list[dict]) -> str:
         timeout=120,
     )
 
-    print(resp.status_code)
-    print(resp.text[:500])
+    print("OLLAMA STATUS:", resp.status_code, flush=True)
+    print(resp.text[:500], flush=True)
 
     resp.raise_for_status()
+
     return resp.json()["message"]["content"]
 
 
