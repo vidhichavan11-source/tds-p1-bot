@@ -58,3 +58,4 @@
 {"type": "tool_call", "step": 1, "code": "print(10 + 5)", "result": {"stdout": "15\n", "stderr": "", "returncode": 0}, "chat_id": 1172630671, "ts": 1785434312.9489064}
 {"type": "model_output", "step": 2, "content": "THOUGHT: The output of the previous command is provided as an observation.\n\nFINAL:\n{\"result\": 15}", "ts": 1785434327.877764, "chat_id": 1172630671}
 {"type": "final_answer", "step": 2, "answer": {"result": 15}, "chat_id": 1172630671, "ts": 1785434328.986874}
+{"type": "reply_sent", "chat_id": 1172630671, "reply": {"result": 15, "log_url": "https://raw.githubusercontent.com/vidhichavan11-source/tds-p1-bot/main/logs/run.jsonl"}, "ts": 1785434331.0660145}
