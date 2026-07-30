@@ -32,7 +32,7 @@ import requests
 from .executor import run_python
 
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
-OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "qwen2.5:7b-instruct")
+OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "gemma3:4b")
 MAX_STEPS = 8
 
 SYSTEM_PROMPT = """You are a careful data-analyst agent. You answer a single \
