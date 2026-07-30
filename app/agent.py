@@ -22,7 +22,7 @@ OLLAMA_URL = os.environ.get(
 
 OLLAMA_MODEL = os.environ.get(
     "OLLAMA_MODEL",
-    "gemma3:4b"
+    "llama3.2:1b"
 )
 
 MAX_STEPS = 5
