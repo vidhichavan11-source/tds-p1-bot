@@ -42,7 +42,7 @@ app = FastAPI(
 # Health / status endpoints
 # -----------------------------
 
-@app.get("/")
+@app.api_route("/", methods=["GET", "HEAD"])
 async def root():
     return {
         "status": "running",
@@ -142,10 +142,10 @@ def _build_context(chat_id: int, text: str):
 
 def _process_update(chat_id: int, message_text: str):
 
-    print("=== PROCESS START ===")
-    print("Chat:", chat_id)
-    print("Message:", message_text)
+    print("🔥🔥🔥 BACKGROUND FUNCTION STARTED 🔥🔥🔥", flush=True)
 
+    print("Chat:", chat_id, flush=True)
+    print("Message:", message_text, flush=True)
 
     _safe_log(
         {
@@ -155,17 +155,13 @@ def _process_update(chat_id: int, message_text: str):
         }
     )
 
-
     question = _build_context(
         chat_id,
         message_text
     )
 
-
     try:
-
-        print("Calling run_agent...")
-
+        print("🔥 Calling run_agent...", flush=True)
 
         answer = run_agent(
             question,
@@ -178,15 +174,12 @@ def _process_update(chat_id: int, message_text: str):
                 )
         )
 
-
-        print("run_agent finished")
-
+        print("🔥 run_agent finished", flush=True)
 
     except Exception as e:
 
         import traceback
         traceback.print_exc()
-
 
         _send_telegram_message(
             chat_id,
@@ -196,7 +189,7 @@ def _process_update(chat_id: int, message_text: str):
         return
 
 
-
+    # Prepare reply
     if isinstance(answer, dict):
 
         answer["log_url"] = log_url()
@@ -207,7 +200,6 @@ def _process_update(chat_id: int, message_text: str):
             "answer": answer,
             "log_url": log_url()
         }
-
 
 
     reply = json.dumps(
@@ -225,19 +217,15 @@ def _process_update(chat_id: int, message_text: str):
     )
 
 
+    print("Sending Telegram reply...", flush=True)
+
     _send_telegram_message(
         chat_id,
         reply
     )
 
 
-    print("=== PROCESS END ===")
-
-
-
-# -----------------------------
-# Telegram webhook
-# -----------------------------
+    print("🔥🔥🔥 PROCESS END 🔥🔥🔥", flush=True)
 
 @app.post("/webhook/{secret}")
 async def telegram_webhook(
