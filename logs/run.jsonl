@@ -39,3 +39,4 @@
 {"type": "reply_sent", "chat_id": 8577605645, "reply": {"result": 15, "log_url": "https://raw.githubusercontent.com/vidhichavan11-source/tds-p1-bot/main/logs/run.jsonl"}, "ts": 1785431300.137472}
 {"type": "incoming_message", "chat_id": 8577605645, "text": "hello", "ts": 1785432079.9013717}
 {"type": "incoming_message", "chat_id": 8577605645, "text": "Calculate 5+10", "ts": 1785432107.5769875}
+{"type": "incoming_message", "chat_id": 8577605645, "text": "What is the average of 10,20,30?", "ts": 1785432168.3722}
