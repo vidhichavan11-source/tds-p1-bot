@@ -62,3 +62,4 @@
 {"type": "incoming_message", "chat_id": 1172630671, "text": "What is the average of 10,20,30?", "ts": 1785434380.8591607}
 {"type": "model_output", "step": 1, "content": "THOUGHT: To calculate the average, we need to sum up all numbers and divide by the total count.\n\nACTION:\npython code here\nprint((10 + 20 + 30) / 3)\n\nFINAL:\n{\"result\": 20.0}", "ts": 1785434404.4226403, "chat_id": 1172630671}
 {"type": "final_answer", "step": 1, "answer": {"result": 20.0}, "chat_id": 1172630671, "ts": 1785434405.806677}
+{"type": "reply_sent", "chat_id": 1172630671, "reply": {"result": 20.0, "log_url": "https://raw.githubusercontent.com/vidhichavan11-source/tds-p1-bot/main/logs/run.jsonl"}, "ts": 1785434407.1735265}
