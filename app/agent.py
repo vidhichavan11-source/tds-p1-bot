@@ -1,7 +1,7 @@
 """
 Minimal ReAct-style agent driven by Ollama.
 
-Uses a simple ACTION / FINAL text protocol because small models
+Uses ACTION / FINAL text protocol because small local models
 are unreliable with native tool calling.
 """
 
@@ -29,68 +29,72 @@ MAX_STEPS = 5
 
 
 SYSTEM_PROMPT = """
-You are a data analyst agent.
+You are a careful data analyst agent.
 
-IMPORTANT:
-- Never say hello.
-- Never ask the user questions.
-- Always follow the required format exactly.
-- Use ACTION before FINAL whenever computation is needed.
-- Never invent data.
+Rules:
+- Never greet the user.
+- Never ask questions.
+- Never invent numbers.
+- Always compute using Python when calculation is needed.
+- Always follow the format exactly.
 
-Your response must be ONLY one of these:
+Every response MUST start with:
+
+THOUGHT:
+
+For computation use:
 
 THOUGHT: short explanation
 ACTION:
-<python code>
+python code here
 
-OR
+The python code MUST print the result.
+
+After receiving OBSERVATION, provide:
 
 THOUGHT: short explanation
 FINAL:
 {"key":"value"}
 
-For ACTION:
-Write only Python code after ACTION.
-The code must print the result.
-
-For FINAL:
-Return only valid JSON.
+FINAL must contain ONLY valid JSON.
 """
 
 
-# Accept:
+# Handles:
+#
+# ACTION:
+# print(5+10)
+#
 # ACTION: python
 # CODE:
 # ```python
-# print(...)
+# print(5+10)
 # ```
 #
-# OR:
-# ACTION:
-# print(...)
-#
 ACTION_RE = re.compile(
-    r"ACTION:\s*(?:python)?\s*(?:CODE:)?\s*"
-    r"(?:```(?:python)?\s*)?"
-    r"(?P<code>.*?)(?:```|$)",
-    re.DOTALL | re.IGNORECASE,
+    r"ACTION:\s*(?:python)?\s*(?:CODE:\s*)?"
+    r"(?:```python\s*)?"
+    r"(?P<code>[\s\S]*?)"
+    r"(?:```|(?=\nTHOUGHT:)|(?=\nFINAL:)|$)",
+    re.IGNORECASE
 )
 
 
-# Accept:
-# FINAL: {"answer":1}
+# Handles:
 #
-# OR:
+# FINAL:
+# {"answer":15}
+#
 # FINAL:
 # ```json
-# {"answer":1}
+# {"answer":15}
 # ```
+#
 FINAL_RE = re.compile(
-    r"FINAL:\s*(?:```json)?\s*"
-    r"(?P<final>\{.*?\})"
-    r"\s*(?:```)?\s*$",
-    re.DOTALL | re.IGNORECASE,
+    r"FINAL:\s*(?:```json\s*)?"
+    r"(?P<final>\{[\s\S]*?\})"
+    r"\s*(?:```)?",
+    re.IGNORECASE
 )
 
 
@@ -108,10 +112,11 @@ def _call_ollama(messages: list[dict]) -> str:
             "messages": messages,
             "stream": False,
             "options": {
-                "temperature": 0.1
-            },
+                "temperature": 0,
+                "num_ctx": 4096
+            }
         },
-        timeout=120,
+        timeout=120
     )
 
 
@@ -134,7 +139,6 @@ def _call_ollama(messages: list[dict]) -> str:
 
 
 def run_agent(question: str, log_fn=None) -> dict:
-
 
     messages = [
         {
@@ -162,6 +166,7 @@ def run_agent(question: str, log_fn=None) -> dict:
 
 
         if log_fn:
+
             log_fn(
                 {
                     "type": "model_output",
@@ -173,10 +178,11 @@ def run_agent(question: str, log_fn=None) -> dict:
 
 
         # -------------------------
-        # Check FINAL
+        # FINAL handling
         # -------------------------
 
         final_match = FINAL_RE.search(raw)
+
 
         if final_match:
 
@@ -189,6 +195,7 @@ def run_agent(question: str, log_fn=None) -> dict:
 
 
                 if log_fn:
+
                     log_fn(
                         {
                             "type": "final_answer",
@@ -203,12 +210,21 @@ def run_agent(question: str, log_fn=None) -> dict:
 
             except json.JSONDecodeError as e:
 
-
                 messages.append(
                     {
                         "role": "user",
                         "content":
-                        f"Invalid JSON. Fix FINAL only. Error: {e}"
+                        f"""
+Your JSON is invalid.
+
+Error:
+{e}
+
+Return ONLY:
+
+FINAL:
+{{"key":"value"}}
+"""
                     }
                 )
 
@@ -217,7 +233,7 @@ def run_agent(question: str, log_fn=None) -> dict:
 
 
         # -------------------------
-        # Check ACTION
+        # ACTION handling
         # -------------------------
 
         action_match = ACTION_RE.search(raw)
@@ -225,18 +241,16 @@ def run_agent(question: str, log_fn=None) -> dict:
 
         if action_match:
 
-
             code = action_match.group("code").strip()
 
 
-            # avoid empty execution
             if not code:
 
                 messages.append(
                     {
                         "role": "user",
                         "content":
-                        "ACTION was empty. Provide python code."
+                        "ACTION was empty. Provide Python code."
                     }
                 )
 
@@ -248,6 +262,7 @@ def run_agent(question: str, log_fn=None) -> dict:
 
 
             if log_fn:
+
                 log_fn(
                     {
                         "type": "tool_call",
@@ -279,7 +294,7 @@ def run_agent(question: str, log_fn=None) -> dict:
 
 
         # -------------------------
-        # Format failure
+        # Format recovery
         # -------------------------
 
         messages.append(
@@ -287,19 +302,21 @@ def run_agent(question: str, log_fn=None) -> dict:
                 "role": "user",
                 "content":
                 """
-Follow the format exactly.
+Follow the required format.
 
-Use:
+Example:
 
-THOUGHT:
+THOUGHT: Need calculation
+
 ACTION:
-python code
+print(5+10)
 
-or
+OR
 
-THOUGHT:
+THOUGHT: Done
+
 FINAL:
-JSON
+{"answer":15}
 """
             }
         )
@@ -318,6 +335,7 @@ JSON
 
 
     if log_fn:
+
         log_fn(
             {
                 "type": "max_steps_exceeded"
