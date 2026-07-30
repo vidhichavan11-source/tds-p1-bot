@@ -43,3 +43,4 @@
 {"type": "incoming_message", "chat_id": 8577605645, "text": "What is thr average of 10,30,30?", "ts": 1785432316.1404097}
 {"type": "incoming_message", "chat_id": 8577605645, "text": "Calculate 5+10", "ts": 1785432498.3353636}
 {"type": "incoming_message", "chat_id": 1172630671, "text": "/start", "ts": 1785432883.264689}
+{"type": "model_output", "step": 1, "content": "THOUGHT: The user has not provided any observation yet. This is the beginning of our conversation.\n\nFINAL: {\"key\": \"value\"}", "ts": 1785432910.7539184, "chat_id": 1172630671}
