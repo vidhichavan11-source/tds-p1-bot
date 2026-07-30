@@ -28,7 +28,6 @@ WEBHOOK_SECRET = os.environ["TELEGRAM_WEBHOOK_SECRET"]
 TELEGRAM_API = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}"
 
 
-# Store recent conversation history per chat
 THREAD_WINDOW_SECONDS = 120
 _chat_history = defaultdict(list)
 
@@ -39,7 +38,7 @@ app = FastAPI(
 
 
 # -----------------------------
-# Health / status endpoints
+# Health endpoints
 # -----------------------------
 
 @app.api_route("/", methods=["GET", "HEAD"])
@@ -58,17 +57,24 @@ async def health():
 
 
 # -----------------------------
-# Logging helper
+# Logging
 # -----------------------------
 
 def _safe_log(entry: dict):
-    entry.setdefault("ts", time.time())
+
+    entry.setdefault(
+        "ts",
+        time.time()
+    )
 
     try:
         append_log_line(entry)
 
     except Exception as e:
-        print(f"[LOG ERROR] {e}")
+        print(
+            f"[LOG ERROR] {e}",
+            flush=True
+        )
 
 
 # -----------------------------
@@ -78,6 +84,7 @@ def _safe_log(entry: dict):
 def _send_telegram_message(chat_id: int, text: str):
 
     try:
+
         response = requests.post(
             f"{TELEGRAM_API}/sendMessage",
             json={
@@ -87,18 +94,25 @@ def _send_telegram_message(chat_id: int, text: str):
             timeout=15
         )
 
+
         print(
             "Telegram response:",
             response.status_code,
-            response.text
+            response.text,
+            flush=True
         )
 
+
     except Exception as e:
-        print(f"[Telegram send failed] {e}")
+
+        print(
+            f"[Telegram send failed] {e}",
+            flush=True
+        )
 
 
 # -----------------------------
-# Conversation context
+# Context memory
 # -----------------------------
 
 def _build_context(chat_id: int, text: str):
@@ -110,6 +124,7 @@ def _build_context(chat_id: int, text: str):
     history.append(
         (now, text)
     )
+
 
     history[:] = [
         (ts, msg)
@@ -137,15 +152,29 @@ def _build_context(chat_id: int, text: str):
 
 
 # -----------------------------
-# Background processing
+# Background processor
 # -----------------------------
 
 def _process_update(chat_id: int, message_text: str):
 
-    print("🔥🔥🔥 BACKGROUND FUNCTION STARTED 🔥🔥🔥", flush=True)
+    print(
+        "🔥🔥🔥 BACKGROUND FUNCTION STARTED 🔥🔥🔥",
+        flush=True
+    )
 
-    print("Chat:", chat_id, flush=True)
-    print("Message:", message_text, flush=True)
+
+    print(
+        "Chat:",
+        chat_id,
+        flush=True
+    )
+
+
+    print(
+        "Message:",
+        message_text,
+        flush=True
+    )
 
 
     _safe_log(
@@ -157,18 +186,24 @@ def _process_update(chat_id: int, message_text: str):
     )
 
 
-    # Quick replies for greetings
+    # Greeting shortcut
     if message_text.lower().strip() in [
         "hello",
         "hi",
         "hey",
         "hii"
     ]:
+
         _send_telegram_message(
             chat_id,
             "Hello! 👋 I am your data analyst bot. Ask me a data question."
         )
-        print("Greeting handled", flush=True)
+
+        print(
+            "Greeting handled",
+            flush=True
+        )
+
         return
 
 
@@ -180,7 +215,10 @@ def _process_update(chat_id: int, message_text: str):
 
     try:
 
-        print("🔥 Calling run_agent...", flush=True)
+        print(
+            "🔥 Calling run_agent...",
+            flush=True
+        )
 
 
         answer = run_agent(
@@ -195,12 +233,16 @@ def _process_update(chat_id: int, message_text: str):
         )
 
 
-        print("🔥 run_agent finished", flush=True)
+        print(
+            "🔥 run_agent finished",
+            flush=True
+        )
 
 
     except Exception as e:
 
         import traceback
+
         traceback.print_exc()
 
 
@@ -241,7 +283,10 @@ def _process_update(chat_id: int, message_text: str):
     )
 
 
-    print("Sending Telegram reply...", flush=True)
+    print(
+        "Sending Telegram reply...",
+        flush=True
+    )
 
 
     _send_telegram_message(
@@ -250,8 +295,16 @@ def _process_update(chat_id: int, message_text: str):
     )
 
 
-       print("🔥🔥🔥 PROCESS END 🔥🔥🔥", flush=True)
+    print(
+        "🔥🔥🔥 PROCESS END 🔥🔥🔥",
+        flush=True
+    )
 
+
+
+# -----------------------------
+# Telegram webhook
+# -----------------------------
 
 @app.post("/webhook/{secret}")
 async def telegram_webhook(
@@ -297,9 +350,22 @@ async def telegram_webhook(
     text = message["text"]
 
 
-    print("=== WEBHOOK RECEIVED ===")
-    print("Chat ID:", chat_id)
-    print("Message:", text)
+    print(
+        "=== WEBHOOK RECEIVED ===",
+        flush=True
+    )
+
+    print(
+        "Chat ID:",
+        chat_id,
+        flush=True
+    )
+
+    print(
+        "Message:",
+        text,
+        flush=True
+    )
 
 
     background_tasks.add_task(
@@ -309,7 +375,10 @@ async def telegram_webhook(
     )
 
 
-    print("=== BACKGROUND TASK ADDED ===")
+    print(
+        "=== BACKGROUND TASK ADDED ===",
+        flush=True
+    )
 
 
     return {
