@@ -84,6 +84,10 @@ def _call_ollama(messages: list[dict]) -> str:
         },
         timeout=120,
     )
+
+    print(resp.status_code)
+    print(resp.text[:500])
+
     resp.raise_for_status()
     return resp.json()["message"]["content"]
 
