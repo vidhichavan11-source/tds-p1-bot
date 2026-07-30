@@ -44,3 +44,4 @@
 {"type": "incoming_message", "chat_id": 8577605645, "text": "Calculate 5+10", "ts": 1785432498.3353636}
 {"type": "incoming_message", "chat_id": 1172630671, "text": "/start", "ts": 1785432883.264689}
 {"type": "model_output", "step": 1, "content": "THOUGHT: The user has not provided any observation yet. This is the beginning of our conversation.\n\nFINAL: {\"key\": \"value\"}", "ts": 1785432910.7539184, "chat_id": 1172630671}
+{"type": "final_answer", "step": 1, "answer": {"key": "value"}, "chat_id": 1172630671, "ts": 1785432911.800715}
