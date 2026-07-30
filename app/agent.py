@@ -45,14 +45,16 @@ THOUGHT:
 For computation use:
 
 THOUGHT: short explanation
-ACTION:
-python code here
 
-The python code MUST print the result.
+ACTION:
+print(...)
+
+The Python code MUST print the result.
 
 After receiving OBSERVATION, provide:
 
 THOUGHT: short explanation
+
 FINAL:
 {"key":"value"}
 
@@ -179,6 +181,67 @@ def run_agent(question: str, log_fn=None) -> dict:
 
 
         # -------------------------
+        # ACTION handling
+        # -------------------------
+
+        action_match = ACTION_RE.search(raw)
+
+
+        if action_match:
+
+            code = action_match.group("code").strip()
+            code = code.replace("python code here", "").strip()
+
+
+            if not code:
+
+                messages.append(
+                    {
+                        "role": "user",
+                        "content":
+                        "ACTION was empty. Provide Python code."
+                    }
+                )
+
+                continue
+
+
+
+            result = run_python(code)
+
+
+            if log_fn:
+
+                log_fn(
+                    {
+                        "type": "tool_call",
+                        "step": step,
+                        "code": code,
+                        "result": result
+                    }
+                )
+
+
+            observation = (
+                "OBSERVATION:\n"
+                f"stdout:\n{result['stdout']}\n"
+                f"stderr:\n{result['stderr']}\n"
+                f"returncode:{result['returncode']}"
+            )
+
+
+            messages.append(
+                {
+                    "role": "user",
+                    "content": observation
+                }
+            )
+
+
+            continue
+
+
+        # -------------------------
         # FINAL handling
         # -------------------------
 
@@ -231,66 +294,6 @@ FINAL:
 
                 continue
 
-
-
-        # -------------------------
-        # ACTION handling
-        # -------------------------
-
-        action_match = ACTION_RE.search(raw)
-
-
-        if action_match:
-
-            code = action_match.group("code").strip()
-
-
-            if not code:
-
-                messages.append(
-                    {
-                        "role": "user",
-                        "content":
-                        "ACTION was empty. Provide Python code."
-                    }
-                )
-
-                continue
-
-
-
-            result = run_python(code)
-
-
-            if log_fn:
-
-                log_fn(
-                    {
-                        "type": "tool_call",
-                        "step": step,
-                        "code": code,
-                        "result": result
-                    }
-                )
-
-
-            observation = (
-                "OBSERVATION:\n"
-                f"stdout:\n{result['stdout']}\n"
-                f"stderr:\n{result['stderr']}\n"
-                f"returncode:{result['returncode']}"
-            )
-
-
-            messages.append(
-                {
-                    "role": "user",
-                    "content": observation
-                }
-            )
-
-
-            continue
 
 
 
