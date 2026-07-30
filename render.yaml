@@ -13,7 +13,7 @@ services:
       - key: OLLAMA_URL
         sync: false
       - key: OLLAMA_MODEL
-        value: qwen2.5:7b-instruct
+        value: gemma3:4b
       - key: GITHUB_TOKEN
         sync: false
       - key: GITHUB_REPO
