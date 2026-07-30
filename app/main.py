@@ -72,16 +72,25 @@ def _build_context(chat_id: int, text: str) -> str:
     )
 
 
-def _process_update(chat_id: int, message_text: str) -> None:
+def _process_update(chat_id: int, message_text: str):
+    print("=== _process_update started ===")
+    print(chat_id)
+    print(message_text)
+
     _safe_log({"type": "incoming_message", "chat_id": chat_id, "text": message_text})
 
     question_with_context = _build_context(chat_id, message_text)
 
     try:
+        print("Calling run_agent...")
+
         answer = run_agent(
             question_with_context,
             log_fn=lambda entry: _safe_log({**entry, "chat_id": chat_id}),
         )
+
+        print("run_agent finished")
+
     except Exception as e:
         import traceback
         traceback.print_exc()
@@ -106,14 +115,20 @@ async def telegram_webhook(secret: str, request: Request, background_tasks: Back
     update = await request.json()
     message = update.get("message") or update.get("edited_message")
     if not message or "text" not in message:
-        return {"ok": True}  # ignore non-text updates
+        return {"ok": True}
 
     chat_id = message["chat"]["id"]
     text = message["text"]
 
-    background_tasks.add_task(_process_update, chat_id, text)
-    return {"ok": True}
+    print("=== Webhook received ===")
+    print(f"Chat ID: {chat_id}")
+    print(f"Message: {text}")
 
+    background_tasks.add_task(_process_update, chat_id, text)
+
+    print("=== Background task added ===")
+
+    return {"ok": True}
 
 @app.get("/health")
 async def health():
