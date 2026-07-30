@@ -250,7 +250,9 @@ def _process_update(chat_id: int, message_text: str):
     )
 
 
-    print("🔥🔥🔥 PROCESS END 🔥🔥🔥", flush=True)
+       print("🔥🔥🔥 PROCESS END 🔥🔥🔥", flush=True)
+
+
 @app.post("/webhook/{secret}")
 async def telegram_webhook(
         secret: str,
