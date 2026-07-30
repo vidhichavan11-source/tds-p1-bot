@@ -257,6 +257,9 @@ def _process_update(chat_id: int, message_text: str):
 
     if isinstance(answer, dict):
 
+        if "result" in answer and "answer" not in answer:
+            answer = {"answer": answer["result"]}
+
         answer["log_url"] = log_url()
 
     else:
