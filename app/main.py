@@ -73,25 +73,38 @@ def _build_context(chat_id: int, text: str) -> str:
 
 
 def _process_update(chat_id: int, message_text: str) -> None:
-    _safe_log({"type": "incoming_message", "chat_id": chat_id, "text": message_text})
+    try:
+        _safe_log({"type": "incoming_message", "chat_id": chat_id, "text": message_text})
 
-    question_with_context = _build_context(chat_id, message_text)
+        question_with_context = _build_context(chat_id, message_text)
 
-    answer = run_agent(
-        question_with_context,
-        log_fn=lambda entry: _safe_log({**entry, "chat_id": chat_id}),
-    )
+        answer = run_agent(
+            question_with_context,
+            log_fn=lambda entry: _safe_log({**entry, "chat_id": chat_id}),
+        )
 
-    # Always control log_url ourselves -- never trust the model to get
-    # this exactly right.
-    if isinstance(answer, dict):
-        answer["log_url"] = log_url()
-    else:
-        answer = {"answer": answer, "log_url": log_url()}
+        if isinstance(answer, dict):
+            answer["log_url"] = log_url()
+        else:
+            answer = {"answer": answer, "log_url": log_url()}
 
-    reply_text = json.dumps(answer, ensure_ascii=False)
-    _safe_log({"type": "reply_sent", "chat_id": chat_id, "reply": answer})
-    _send_telegram_message(chat_id, reply_text)
+        reply_text = json.dumps(answer, ensure_ascii=False)
+
+        _safe_log({"type": "reply_sent", "chat_id": chat_id, "reply": answer})
+
+        response = requests.post(
+            f"{TELEGRAM_API}/sendMessage",
+            json={"chat_id": chat_id, "text": reply_text},
+            timeout=15,
+        )
+
+        print("Telegram sendMessage:", response.status_code, response.text)
+
+    except Exception as e:
+        import traceback
+
+        print("ERROR IN _process_update")
+        traceback.print_exc()
 
 
 @app.post("/webhook/{secret}")
