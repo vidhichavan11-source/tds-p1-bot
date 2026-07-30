@@ -33,3 +33,4 @@
 {"type": "model_output", "step": 3, "content": "THOUGHT: The result of 5 + 10 is indeed 15.\nACTION:\nprint(5 + 10)", "ts": 1785431282.7397964, "chat_id": 8577605645}
 {"type": "tool_call", "step": 3, "code": "print(5 + 10)", "result": {"stdout": "15\n", "stderr": "", "returncode": 0}, "chat_id": 8577605645, "ts": 1785431283.9747257}
 {"type": "model_output", "step": 4, "content": "{\"result\": \"15\", \"returncode\": \"0\"}", "ts": 1785431288.939828, "chat_id": 8577605645}
+{"type": "format_error", "step": 4, "raw": "{\"result\": \"15\", \"returncode\": \"0\"}", "chat_id": 8577605645, "ts": 1785431290.423957}
